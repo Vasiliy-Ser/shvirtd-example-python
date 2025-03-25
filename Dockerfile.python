@@ -1,0 +1,20 @@
+# Используем базовый образ Python 3.9 slim
+FROM python:3.9-slim
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Копируем все файлы проекта в контейнер
+COPY . .
+
+# Устанавливаем зависимости
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Устанавливаем переменную окружения для таблицы (по умолчанию 'requests')
+ENV DB_TABLE=requests
+
+# Открываем порт для приложения
+EXPOSE 5000
+
+# Запуск приложения
+CMD ["python", "main.py"]

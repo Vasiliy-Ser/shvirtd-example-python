@@ -1,0 +1,25 @@
+---
+- name: Deploy files to servers via vm
+  hosts: all
+  become: yes
+  vars:
+    vm: "158.160.114.7"
+    vm_user: "master"
+    local_files_path: "/tmp/"
+    remote_tmp_path: "/opt/"
+    ansible_user: "master"
+  tasks:
+    - name: Copy image
+      when: "'web_servers' in group_names"
+      delegate_to: localhost
+      become: yes
+      command: >
+        scp /tmp/my_project_clone.tar {{ vm_user }}@{{ vm }}:{{ remote_tmp_path }}my_project_clone.tar
+
+  tasks:
+    - name: Copy repository
+      when: "'web_servers' in group_names"
+      delegate_to: localhost
+      become: yes
+      command: >
+        scp -r /home/vm30/homework/15.6/shvirtd-example-python {{ vm_user }}@{{ vm }}:{{ remote_tmp_path }}shvirtd-example-python/

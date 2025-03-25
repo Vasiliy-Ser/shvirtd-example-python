@@ -1,0 +1,51 @@
+#version: '3.8'
+
+services:
+  web:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.python
+    image: my_project_clone   # Скачивание образа из Yandex Cloud
+    networks:
+      backend:
+        ipv4_address: 172.20.0.5
+    environment:
+      DB_HOST: db
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+    restart: always
+    ports:
+      - "5000:5000"  # Открываем порт 8090 для доступа к приложению
+    depends_on:
+      - db  # web должен запускаться после db
+
+  db:
+    image: mysql:8
+    networks:
+      backend:
+        ipv4_address: 172.20.0.10
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql  # Для хранения данных MySQL между перезапусками
+    expose:
+      - "3306"  # Экспонируем порт MySQL
+
+#networks:
+#  backend:
+#    driver: bridge
+#    ipam:
+#      config:
+#        - subnet: "172.20.0.0/16"  # Указываем подсеть для bridge-сети
+
+volumes:
+  db_data:
+    driver: local
+
+include:
+  - proxy.yaml  # Включаем файл proxy.yaml
